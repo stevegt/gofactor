@@ -22,7 +22,7 @@ func transformFieldAccesses(node ast.Node, fieldMap FieldMap) ast.Node {
 		case *ast.SelectorExpr:
 			if _, ok := exp.X.(*ast.Ident); ok {
 				// exp.X is an identifier rather than a complex expression
-				// Check if this is part of an assignment (so we don't transform it to a getter)
+				// Check if this is part of an assignment
 				_, isAssign := cursor.Parent().(*ast.AssignStmt)
 				if !isAssign {
 					// is not part of an assignment

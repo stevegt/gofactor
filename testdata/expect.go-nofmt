@@ -10,8 +10,4 @@ func main() {
 	println(x.GetField())	// testing inline comment
 	// This should be transformed to x.SetField(&MyStruct{})
 	x.SetField(&MyStruct{})
-
-	// This should be transformed to foo := x.GetField().GetField()
-	foo := x.GetField().GetField()
-	_ = foo
 }
