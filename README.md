@@ -1,0 +1,2 @@
+# gofactor
+Go refactoring tool
