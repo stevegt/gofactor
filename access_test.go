@@ -33,7 +33,9 @@ func TestRefactorAccess(t *testing.T) {
 	// diff to compare expected and actual
 	diff := cmp.Diff(expect, got)
 	if diff != "" {
-		Pl(got)
+		Pf("\n=== expect:\n%v", expect)
+		Pf("\n=== got:\n%v", got)
+		Pl("\n=== diff:\n")
 		t.Errorf("RefactorAccess() mismatch (-want +got):\n%s", diff)
 	}
 

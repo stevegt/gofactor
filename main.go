@@ -11,12 +11,11 @@ import (
 	"os"
 
 	. "github.com/stevegt/goadapt"
-	"golang.org/x/tools/go/ast/astutil"
 )
 
 func main() {
 	if len(os.Args) < 5 {
-		fmt.Println("Usage: refactor-access <filename> <field> <getter> <setter>")
+		fmt.Println("Usage: gofactor <filename> <field> <getter> <setter>")
 		os.Exit(1)
 	}
 
@@ -104,118 +103,6 @@ func RefactorAccess(rd io.Reader, wr io.Writer, field, getter, setter string) (e
 	printer.Fprint(wr, fset, transformed)
 
 	return nil
-}
-
-/*
-// Visit is a method that is called for each node in the AST.
-// It is used to refactor the file.
-func (v *visitor) Visit(n ast.Node) ast.Visitor {
-	// Switch on the type of the AST node.  The x variable is the node
-	// cast to the appropriate type.
-	switch x := n.(type) {
-	case *ast.AssignStmt:
-		// AST node is an assignment statement.
-		// If the assignment is to a field, refactor it to use the setter
-		if len(x.Lhs) == 1 {
-			// Check if the assignment is to a field.
-			ident, ok := x.Lhs[0].(*ast.SelectorExpr)
-			if ok {
-				// If the field is is in our field map, refactor the assignment
-				if ident.Sel.Name == v.fieldMap[ident.Sel.Name] {
-					// Refactor by turning the assignment into a call to the setter
-					x.Lhs[0] = &ast.CallExpr{
-						Fun: &ast.SelectorExpr{
-							X:   ident.X,
-							Sel: &ast.Ident{Name: v.fieldMap[ident.Sel.Name]},
-						},
-						Args: []ast.Expr{x.Rhs[0]},
-					}
-				}
-			}
-		} else {
-			// lhs is a tuple; just issue a warning for now
-			fmt.Println("Warning: tuple assignment not supported")
-		}
-	case *ast.SelectorExpr:
-		// AST node is a selector expression.  This means that a field is being accessed.
-		// If the field is in our field map, refactor the access to use the getter.
-		name, ok := v.fieldMap[x.Sel.Name]
-		_ = name
-		if ok {
-			// Refactor the access by turning the selector expression into a call to the getter
-
-			x.Sel.Name = v.fieldMap[x.Sel.Name]
-		}
-	}
-
-	return v
-}
-*/
-
-func transformFieldAccesses(node ast.Node, fieldMap FieldMap) ast.Node {
-	return astutil.Apply(node, nil, func(cursor *astutil.Cursor) bool {
-		n := cursor.Node()
-
-		switch exp := n.(type) {
-		case *ast.SelectorExpr:
-			if _, ok := exp.X.(*ast.Ident); ok {
-				// exp.X is an identifier rather than a complex expression
-				// Check if this is part of an assignment (so we don't transform it to a getter)
-				_, isAssign := cursor.Parent().(*ast.AssignStmt)
-				if !isAssign {
-					// is not part of an assignment
-					// Check if the field is in our field map
-					getterName, ok := fieldMap.Getter(exp.Sel.Name)
-					if ok {
-						// Construct the getter call
-						getterCall := &ast.CallExpr{
-							Fun: &ast.SelectorExpr{
-								X:   exp.X,
-								Sel: ast.NewIdent(getterName),
-							},
-						}
-						// Manually adjust the comment placement
-						getterCall.Lparen = exp.Sel.End()
-						getterCall.Rparen = exp.Sel.End()
-						// Replace node and transfer comments
-						cursor.Replace(getterCall)
-						transferComments(exp, getterCall)
-					}
-				}
-			}
-		case *ast.AssignStmt:
-			// AST node is an assignment statement.
-			if len(exp.Lhs) == 1 && len(exp.Rhs) == 1 {
-				// we have exactly one LHS and RHS
-				if selExpr, ok := exp.Lhs[0].(*ast.SelectorExpr); ok {
-					// selExpr is a selector expression
-					if _, ok := selExpr.X.(*ast.Ident); ok {
-						// selExpr.X is an identifier rather than a
-						// complex expression.
-						// get the field name
-						fieldName := selExpr.Sel.Name
-						// Check if the field is in our field map
-						setterName, ok := fieldMap.Setter(fieldName)
-						if ok {
-							// Field is in our field map -- construct the setter call
-							setterCall := &ast.CallExpr{
-								Fun: &ast.SelectorExpr{
-									X:   selExpr.X,
-									Sel: ast.NewIdent(setterName),
-								},
-								Args: []ast.Expr{exp.Rhs[0]},
-							}
-							exprStmt := &ast.ExprStmt{X: setterCall}
-							// Replace node and transfer comments
-							cursor.Replace(exprStmt)
-							transferComments(exp, exprStmt)
-						}
-					}
-				}
-			}
-		}
-		return true
-	})
 }
 
 // Function to transfer comments from old node to new node
