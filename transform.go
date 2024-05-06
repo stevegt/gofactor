@@ -7,6 +7,9 @@ import (
 	"golang.org/x/tools/go/ast/astutil"
 )
 
+// transformFieldAccesses transforms field accesses in the AST node to
+// getter and setter calls.  It uses astutil.Apply to traverse the AST
+// and replace field accesses with getter and setter calls.
 func transformFieldAccesses(node ast.Node, fieldMap FieldMap) ast.Node {
 	return astutil.Apply(node, nil, func(cursor *astutil.Cursor) bool {
 		n := cursor.Node()

@@ -21,7 +21,11 @@ func TestRefactorAccess(t *testing.T) {
 	// create io.Writer
 	w := new(strings.Builder)
 
-	// refactor the source code
+	// transformFieldAccesses transforms field accesses in the AST node to
+	// getter and setter calls.  It uses astutil.Apply to traverse the AST
+	// and replace field accesses with getter and setter calls.
+
+	// RefactorAccess calls transformFieldAccesses
 	err = RefactorAccess(r, w, "Field", "GetField", "SetField")
 	Tassert(t, err == nil, "RefactorAccess failed: %v", err)
 
