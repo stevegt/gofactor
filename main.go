@@ -75,8 +75,8 @@ func (fm FieldMap) Setter(field string) (setter string, ok bool) {
 	return "", false
 }
 
-// RefactorAccess, given an io.Reader, field name, getter name, and
-// setter name, refactors the content to use the getter and setter
+// RefactorAccess takes an io.Reader, field name, getter name, and
+// setter name, and refactors the content to use the getter and setter
 // rather than direct access to the field.  It writes the refactored
 // content to the io.Writer.
 //

@@ -9,7 +9,11 @@ import (
 
 // transformFieldAccesses transforms field accesses in the AST node to
 // getter and setter calls.  It uses astutil.Apply to traverse the AST
-// and replace field accesses with getter and setter calls.
+// and replace field accesses with getter and setter calls.  It properly
+// handles comments by transferring them to the new nodes.  It uses the
+// FieldMap to determine the getter and setter names for each field.
+// It properly handles nested field accesses such as `a.b.c`,
+// converting them to `GetA().GetB().GetC()`.
 func transformFieldAccesses(node ast.Node, fieldMap FieldMap) ast.Node {
 	return astutil.Apply(node, nil, func(cursor *astutil.Cursor) bool {
 		n := cursor.Node()
