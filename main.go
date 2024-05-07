@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"go/ast"
 	"go/parser"
 	"go/printer"
 	"go/token"
@@ -103,17 +102,4 @@ func RefactorAccess(rd io.Reader, wr io.Writer, field, getter, setter string) (e
 	printer.Fprint(wr, fset, transformed)
 
 	return nil
-}
-
-// Function to transfer comments from old node to new node
-func transferComments(oldNode, newNode ast.Node) {
-	oldCmt := oldNode.End()
-	newCmt := newNode.End()
-	if oldCmt.IsValid() && newCmt.IsValid() {
-		// Adjust the position of the comments
-		if oldCmt != newCmt {
-			// Logic to ensure comments are repositioned correctly
-			// This part is abstract since positioning will depend on specifics not covered here
-		}
-	}
 }

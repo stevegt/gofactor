@@ -1,0 +1,17 @@
+package main
+
+type MyStruct struct {
+	A struct {
+		B struct {
+			C struct {
+				D int
+			}
+		}
+	}
+}
+
+func main() {
+	x := MyStruct{}
+	// This should become x.GetA().GetB().GetC().GetD()
+	_ = x.A.B.C.D
+}

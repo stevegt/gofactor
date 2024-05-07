@@ -61,7 +61,8 @@ func main() {
 
     func main() {
         x := MyStruct{}
-        _ = x.A.B.C.D // This should become x.GetA().GetB().GetC().GetD()
+		// This should become x.GetA().GetB().GetC().GetD()
+        _ = x.A.B.C.D 
     }`
 
 	fset := token.NewFileSet()
